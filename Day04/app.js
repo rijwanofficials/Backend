@@ -2,17 +2,18 @@ const http = require('http')
 const fsPromises = require('fs/promises')
 
 const server = http.createServer(async (req, res) => {
-    console.log("--->", req.method, req.url, new Date())
     try {
-        if (req.url == '/home') {
+        if (req.url == '/') {
             const data = await fsPromises.readFile("./Pages/HomePage.html", "utf-8");
+            console.log("data",data);
+            console.log( "TypeofData",typeof data);
+            console.log("---------------------");
+            console.log("---------------------");
+            const newData = data.replace("__MAIN__", "<h1>Hello from Server</h1>")
+            console.log(newData);
+            console.log("TypeofData", typeof newData);
             res.writeHead(200, { "Content-Type": "text/html" });
-            res.end(data);
-        }
-        else if (req.url == '/HomePage.js') {
-            const data = await fsPromises.readFile("./Pages/HomePage.js", "utf-8");
-            res.writeHead(200, { "Content-Type": "text/html" });
-            res.end(data);
+            res.end(newData);
         }
         else if (req.url == '/about') {
             const data = await fsPromises.readFile("./Pages/AboutPage.html", "utf-8");
