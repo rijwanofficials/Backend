@@ -12,12 +12,15 @@ const server = http.createServer((req, res) => {
     res.end(
         JSON.stringify({
             isSuccess: true,
-            message: "Server is running"
+            message: "Server is running",
+            data: {
+
+            }
         })
     );
 });
 
 
-server.listen(2900, () => {
+server.listen(3000, () => {
     console.log("--------Server Started-----------");
 })
