@@ -7,8 +7,6 @@ const app = express();
 const FILE_PATH = "./data.json";
 // const ORDERS_FILE_PATH = "./orders.json";
 app.use(express.json());
-
-
 app.use((req, res, next) => {
     console.log("-->", req.method, req.url);
     next();
@@ -110,15 +108,15 @@ app.delete("/api/v1/products/:productId", async (req, res) => {
 });
 
 
-app.post("/api/v1/orders", async (req, res) => {
-    const data = req.body;
-    const { productId } = data;
-    res.status(201)
-    res.json({
-        isSuccess: true,
-        message: "product created",
-    })
-});
+// app.post("/api/v1/orders", async (req, res) => {
+//     const data = req.body;
+//     const { productId } = data;
+//     res.status(201)
+//     res.json({
+//         isSuccess: true,
+//         message: "product created",
+//     })
+// });
 
 
 app.listen(4900, () => {
