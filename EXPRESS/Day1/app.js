@@ -4,7 +4,8 @@ const { myReadfile, mySaveFile } = require("./utils/fs_helper");
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-
+const FILE_PATH = "./data.json";
+// const ORDERS_FILE_PATH = "./orders.json";
 app.use(express.json());
 
 
@@ -14,7 +15,7 @@ app.use((req, res, next) => {
 }); //midleware
 
 app.get("/api/v1/products", async (req, res) => {
-    const productsArray = await myReadfile("./data.json");
+    const productsArray = await myReadfile(FILE_PATH);
     res.json({
         isSuccess: true,
         message: "get request is working......",
@@ -29,12 +30,12 @@ app.post("/api/v1/products", async (req, res) => {
     const newId = uuidv4();
     data.id = newId;
     console.log("newData", data);
-    const oldArray = await myReadfile("./data.json");
+    const oldArray = await myReadfile(FILE_PATH);
     console.log("🚀 ~ oldArray1:", oldArray)
     console.log("🚀 ~ Type of oldArray:", typeof oldArray);
     oldArray.push(data);
     console.log("oldArray2", oldArray);
-    await mySaveFile("./data.json", oldArray);
+    await mySaveFile(FILE_PATH, oldArray);
     res.status(201)
     res.json({
         isSuccess: true,
@@ -42,6 +43,82 @@ app.post("/api/v1/products", async (req, res) => {
     })
 });
 
+app.patch("/api/v1/products/:productId", async (req, res) => {
+    const { productId } = req.params;
+    const data = req.body;
+    // get old array
+    const products = await myReadfile(FILE_PATH);
+    // check if the given id is valid or not 
+    const indx = products.findIndex((elem) => {
+        return elem.id == productId;
+    });
+    // productId validation
+    if (indx == -1) {
+        res.status(400);
+        res.json({
+            isSuccess: false,
+            message: "invalid product id...."
+        })
+        return;
+    }
+    // array search method find index
+    // change the old object to replace its properties
+    const oldObj = products[indx];
+    products[indx] = { ...oldObj, ...data }
+    // update the object --->save in it array
+    mySaveFile(FILE_PATH, products)
+    // updated array-->save it in file
+    res.status(200);
+    res.json({
+        isSuccess: true,
+        message: "Updated products",
+        data: {
+            products: products[indx]
+        }
+    })
+});
+
+app.delete("/api/v1/products/:productId", async (req, res) => {
+    const { productId } = req.params;
+    // get old array
+    const products = await myReadfile(FILE_PATH);
+    // check if the given id is valid or not 
+    const indx = products.findIndex((elem) => {
+        return elem.id == productId;
+    });
+    // productId validation
+    if (indx == -1) {
+        res.status(400);
+        res.json({
+            isSuccess: false,
+            message: "invalid product id...."
+        })
+        return;
+    }
+    // array search method find index
+    // change the old object to replace its properties
+    products.splice(indx, 1);
+    // update the object --->save in it array
+    mySaveFile(FILE_PATH, products)
+    // updated array-->save it in file
+    res.status(200);
+    res.json({
+        isSuccess: true,
+        message: "Product deleted",
+        data: {}
+    })
+});
+
+
+app.post("/api/v1/orders", async (req, res) => {
+    const data = req.body;
+    const { productId } = data;
+    res.status(201)
+    res.json({
+        isSuccess: true,
+        message: "product created",
+    })
+});
 
 
 app.listen(4900, () => {
