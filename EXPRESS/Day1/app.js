@@ -4,8 +4,8 @@ const { myReadfile, mySaveFile } = require("./utils/fs_helper");
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const FILE_PATH = "./data.json";
-// const ORDERS_FILE_PATH = "./orders.json";
+const FILE_PATH = "./products.json";
+const ORDERS_FILE_PATH = "./orders.json";
 app.use(express.json());
 app.use((req, res, next) => {
     console.log("-->", req.method, req.url);
@@ -78,7 +78,32 @@ app.patch("/api/v1/products/:productId", async (req, res) => {
 
 app.delete("/api/v1/products/:productId", async (req, res) => {
     const { productId } = req.params;
-    // get old array
+    const products = await myReadfile(FILE_PATH);
+    const indx = products.findIndex((elem) => {
+        return elem.id == productId;
+    });
+    if (indx == -1) {
+        res.status(400);
+        res.json({
+            isSuccess: false,
+            message: "invalid product id...."
+        })
+        return;
+    }
+    products.splice(indx, 1);
+    mySaveFile(FILE_PATH, products)
+    res.status(200);
+    res.json({
+        isSuccess: true,
+        message: "Product deleted",
+        data: {}
+    })
+});
+
+
+app.post("/api/v1/orders", async (req, res) => {
+    const data = req.body;
+    const { productId } = data;
     const products = await myReadfile(FILE_PATH);
     // check if the given id is valid or not 
     const indx = products.findIndex((elem) => {
@@ -93,30 +118,33 @@ app.delete("/api/v1/products/:productId", async (req, res) => {
         })
         return;
     }
-    // array search method find index
-    // change the old object to replace its properties
-    products.splice(indx, 1);
-    // update the object --->save in it array
-    mySaveFile(FILE_PATH, products)
-    // updated array-->save it in file
-    res.status(200);
+
+    // reducing the quantity by one since someone bought that one
+    const oldObj = products[indx];
+    const oldQuantity = products[indx].quantity;
+
+    if (oldQuantity <= 0) {
+        res.status(500);
+        res.json({
+            isSuccess: false,
+            message: "Products is out of Stocks..."
+        })
+        return;
+    }
+    // will save the the products 
+    products[indx] = { ...oldObj, quantity: oldQuantity - 1 };
+    mySaveFile(FILE_PATH, products);
+
+    // to create a order
+    const orders = await myReadfile(ORDERS_FILE_PATH);
+    orders.push({ id: uuidv4(), productId: productId })
+    mySaveFile(ORDERS_FILE_PATH, orders);
+    res.status(201)
     res.json({
         isSuccess: true,
-        message: "Product deleted",
-        data: {}
+        message: "order created",
     })
 });
-
-
-// app.post("/api/v1/orders", async (req, res) => {
-//     const data = req.body;
-//     const { productId } = data;
-//     res.status(201)
-//     res.json({
-//         isSuccess: true,
-//         message: "product created",
-//     })
-// });
 
 
 app.listen(4900, () => {
