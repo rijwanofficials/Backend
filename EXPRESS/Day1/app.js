@@ -1,9 +1,13 @@
 const express = require("express");
+// const fs = require("fs");
 const { myReadfile, mySaveFile } = require("./utils/fs_helper");
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
 app.use(express.json());
+
+
 app.use((req, res, next) => {
     console.log("-->", req.method, req.url);
     next();
@@ -21,6 +25,10 @@ app.get("/api/v1/products", async (req, res) => {
 });
 app.post("/api/v1/products", async (req, res) => {
     const data = req.body;
+    console.log("oldData", data);
+    const newId = uuidv4();
+    data.id = newId;
+    console.log("newData", data);
     const oldArray = await myReadfile("./data.json");
     console.log("🚀 ~ oldArray1:", oldArray)
     console.log("🚀 ~ Type of oldArray:", typeof oldArray);
