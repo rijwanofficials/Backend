@@ -1,16 +1,14 @@
 const express = require("express");
+const { createProductController, getProductController } = require("./controllers");
+const { validateProductForCreation } = require("./dto");
 
 const productRouter = express.Router();
 
 // GET "/api/v1/products"
-productRouter.get("/", (req, res) => {
-    res.status(200).send("(GET)Dummy products endpoint.... ")
-});
+productRouter.get("/", getProductController);
 
 // POST "/api/v1/products"
-productRouter.post("/", (req, res) => {
-    res.status(200).send("(POST)Dummy products endpoint.... ")
-});
+productRouter.post("/", validateProductForCreation, createProductController)   // midleware chaining
 
 // PATCH "/api/v1/products/:productId"
 productRouter.patch("/:productId", (req, res) => {

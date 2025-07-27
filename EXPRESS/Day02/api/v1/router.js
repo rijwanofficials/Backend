@@ -13,6 +13,6 @@ apiRouter.use((req, res, next) => {
 apiRouter.use("/orders", orderRouter);
 
 // api/v1/products middleware 
-apiRouter.use("/products",productRouter);
+apiRouter.use("/products", productRouter);
 
-module.exports = { apiRouter };
+module.exports = apiRouter; 

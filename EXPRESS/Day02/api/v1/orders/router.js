@@ -17,7 +17,6 @@ orderRouter.patch("/:productId", (req, res) => {
     res.status(200).send("(PATCH)Dummy orders endpoint.... ")
 });
 
-
 // DELETE "/api/v1/products"
 orderRouter.delete("/:productId", (req, res) => {
     res.status(200).send("(DELETE)Dummy orders endpoint.... ")
