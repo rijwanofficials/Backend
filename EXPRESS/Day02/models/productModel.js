@@ -5,6 +5,7 @@ const PRODUCTS_FILE_PATH = "./models/product.json";
 const saveProducts = async (data) => {
     const products = await myReadfile(PRODUCTS_FILE_PATH);
 
+    // this validation is for if the title name is safe
     const indx = products.findIndex((elem) => {
         if (elem.title == data.title) {
             return true;
@@ -15,15 +16,13 @@ const saveProducts = async (data) => {
     if (indx !== -1) {
         throw new Error("Product with same title is already present");
     }
-
-
-
+    
     data.id = uuidv4();
     products.push(data);
     await mySaveFile(PRODUCTS_FILE_PATH, products)
 };
 
-const readProducts = async (data) => {
+const readProducts = async () => {
     const products = await myReadfile(PRODUCTS_FILE_PATH);
     return products;
 };

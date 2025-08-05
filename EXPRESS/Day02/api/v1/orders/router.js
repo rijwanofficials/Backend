@@ -1,26 +1,22 @@
 const express = require("express");
+const { getOrdersControllers, CreateOrdersControllers, editOrdersControllers } = require("./controllers");
+
 
 const orderRouter = express.Router();
 
 // GET "/api/v1/products"
-orderRouter.get("/", (req, res) => {
-    res.status(200).send("(GET)Dummy orders endpoint.... ")
-});
+orderRouter.get("/", getOrdersControllers)
 
 // POST "/api/v1/products"
-orderRouter.post("/", (req, res) => {
-    res.status(200).send("(POST)Dummy orders endpoint.... ")
-});
+orderRouter.post("/", CreateOrdersControllers)
 
 // PATCH "/api/v1/products"
-orderRouter.patch("/:productId", (req, res) => {
-    res.status(200).send("(PATCH)Dummy orders endpoint.... ")
-});
+orderRouter.patch("/:productId", editOrdersControllers);
 
 // DELETE "/api/v1/products"
-orderRouter.delete("/:productId", (req, res) => {
-    res.status(200).send("(DELETE)Dummy orders endpoint.... ")
-});
+// orderRouter.delete("/:productId", (req, res) => {
+//     res.status(200).send("(DELETE)Dummy orders endpoint.... ")
+// });
 
 
 module.exports = { orderRouter };

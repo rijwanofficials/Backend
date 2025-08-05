@@ -11,14 +11,10 @@ productRouter.get("/", getProductController);
 productRouter.post("/", validateProductForCreation, createProductController)   // midleware chaining
 
 // PATCH "/api/v1/products/:productId"
-productRouter.patch("/:productId", (req, res) => {
-    res.status(200).send("(PATCH)Dummy products endpoint.... ")
-});
+// productRouter.patch("/:productId", editProductController);
 
-// DELETE "/api/v1/products/:productId"
-productRouter.delete("/:productId", (req, res) => {
-    res.status(200).send("(DELETE)Dummy products endpoint.... ")
-});
+// // DELETE "/api/v1/products/:productId"
+// productRouter.delete("/:productId", deleteProductController);
 
 
 module.exports = { productRouter };
