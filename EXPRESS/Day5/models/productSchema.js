@@ -23,9 +23,18 @@ const productSchema = new Schema({
         type: String,
     }
 }, {
-    timestamps: true, 
+    timestamps: true,
     versionKey: false,
 });
+
+// -------------Default Preferences----------
+productSchema.pre("findOneAndUpdate", function () {
+    this.setOptions({
+        runValidators: true,
+        new: true
+    });
+});
+
 
 const ProductModel = model("product", productSchema);
 
