@@ -118,4 +118,84 @@ const deleteProductController = async (req, res) => {
         });
     }
 };
-module.exports = { createProductController, getAllProductController, editProductController, deleteProductController }
+
+
+const listProductController = async (req, res) => {
+    try {
+        console.log("<-----Inside listProductController------>");
+        const { limit, page, select = "title price", q = "", maxPrice, minPrice } = req.query;
+        const searchRegex = new RegExp(q, "ig"); //ig is flag where i means case insensitivity and g means global 
+
+
+        const slelectedItems = select.split(',').join(' ');
+        let limitNum = Number(limit);
+        if (limitNum <= 0 || Number.isNaN(limitNum)) {
+            limitNum = 4;
+        }
+        // const limit = 4;
+        let pageNum = parseInt(page) || 1;
+        if (pageNum <= 0 || Number.isNaN(pageNum)) {
+            pageNum = 1;
+        }
+        const skipNum = (pageNum - 1) * limitNum;
+        const query = ProductModel.find(); // waiter will come and take the order
+        // limit the number or item
+
+
+        // --------QUERY PARAMETER OPTIONS------
+
+
+
+
+        // SELECT Parameter
+        query.select(slelectedItems);
+
+        // SEARCH QUERY Like search?=phone
+        query.or([{ title: searchRegex }, { description: searchRegex }]);
+
+
+        // 1------PRICE QUERY
+        const maxpriceNum = Number(maxPrice)
+        if (maxPrice && !Number.isNaN(maxpriceNum)) {
+            query.where("price").lte(maxPrice)
+        }
+
+
+        // 2------PRICE QUERY
+        const minpriceNum = Number(minPrice)
+        if (minPrice && !Number.isNaN(minpriceNum)) {
+            query.where("price").gte(minPrice);
+        }
+
+
+
+        const queryCopy = query.clone(); //the clone query will have all the instruction that have been given till now 
+        const totalDocumentsCount = await queryCopy.countDocuments();
+
+        // SKIP Parameter
+        query.skip(skipNum);
+        // LIMIT Parameter
+        query.limit(limitNum);//giving waiter some instructions 
+        const products = await query //telling waiter that i have given my order now execute it 
+
+        res.status(200).json({
+            isSuccess: true,
+            message: "Products list...",
+            data: {
+                products: products,
+                total: totalDocumentsCount,
+                skip: skipNum,
+                limit: Math.min(limitNum, products.length)
+            }
+        });
+    } catch (err) {
+        console.log("----Error inside listProductController--->>", err.message);
+        res.status(500).json({
+            isSuccess: false,
+            message: "Failed to fetch products",
+            error: err.message
+        });
+    };
+};
+
+module.exports = { createProductController, getAllProductController, editProductController, deleteProductController, listProductController }
