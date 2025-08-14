@@ -126,7 +126,6 @@ const listProductController = async (req, res) => {
         const { limit, page, select = "title price", q = "", maxPrice, minPrice } = req.query;
         const searchRegex = new RegExp(q, "ig"); //ig is flag where i means case insensitivity and g means global 
 
-
         const slelectedItems = select.split(',').join(' ');
         let limitNum = Number(limit);
         if (limitNum <= 0 || Number.isNaN(limitNum)) {
