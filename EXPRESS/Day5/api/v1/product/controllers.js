@@ -123,13 +123,16 @@ const deleteProductController = async (req, res) => {
 const listProductController = async (req, res) => {
     try {
         console.log("<-----Inside listProductController------>");
-        const { limit, page, select = "title price", q = "", maxPrice, minPrice } = req.query;
+        const { limit, page, select = "title price images quantity", q = "", maxPrice, minPrice } = req.query;
         const searchRegex = new RegExp(q, "ig"); //ig is flag where i means case insensitivity and g means global 
 
         const slelectedItems = select.split(',').join(' ');
         let limitNum = Number(limit);
         if (limitNum <= 0 || Number.isNaN(limitNum)) {
-            limitNum = 4;
+            limitNum = 5;
+        }
+        if (limitNum >= 30) {
+            limitNum = 30;
         }
         // const limit = 4;
         let pageNum = parseInt(page) || 1;
@@ -142,16 +145,11 @@ const listProductController = async (req, res) => {
 
 
         // --------QUERY PARAMETER OPTIONS------
-
-
-
-
         // SELECT Parameter
         query.select(slelectedItems);
 
         // SEARCH QUERY Like search?=phone
         query.or([{ title: searchRegex }, { description: searchRegex }]);
-
 
         // 1------PRICE QUERY
         const maxpriceNum = Number(maxPrice)
@@ -159,14 +157,11 @@ const listProductController = async (req, res) => {
             query.where("price").lte(maxPrice)
         }
 
-
         // 2------PRICE QUERY
         const minpriceNum = Number(minPrice)
         if (minPrice && !Number.isNaN(minpriceNum)) {
             query.where("price").gte(minPrice);
         }
-
-
 
         const queryCopy = query.clone(); //the clone query will have all the instruction that have been given till now 
         const totalDocumentsCount = await queryCopy.countDocuments();
