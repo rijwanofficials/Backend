@@ -30,12 +30,11 @@ const productSchema = new Schema({
 
 // -------------Default Preferences----------
 productSchema.pre("findOneAndUpdate", function () {
-    this.setOptions({
+    this.set({
         runValidators: true,
         new: true
     });
 });
-
 
 const ProductModel = model("product", productSchema);
 
