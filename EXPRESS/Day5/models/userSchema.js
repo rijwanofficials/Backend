@@ -10,10 +10,17 @@ const userSchema = new Schema({
         required: true,
         unique: true,
         trim: true,
+        match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"]
+
     }, password: {
         type: String,
         required: true,
         trim: true,
+        minlength: 6,
+        match: [
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+            "Password must have 8+ chars, 1 uppercase, 1 lowercase, 1 number, and 1 special character"
+        ]
     }, name: {
         type: String,
 

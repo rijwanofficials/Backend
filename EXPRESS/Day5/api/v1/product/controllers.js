@@ -123,7 +123,14 @@ const deleteProductController = async (req, res) => {
 const listProductController = async (req, res) => {
     try {
         console.log("<-----Inside listProductController------>");
-        const { limit, page, select = "title price images quantity", q = "", maxPrice, minPrice } = req.query;
+        const {
+            limit,
+            page,
+            select = "title price images quantity",
+            q = "",
+            maxPrice, minPrice,
+            sort = "title -price -createdAt"
+        } = req.query;
         const searchRegex = new RegExp(q, "ig"); //ig is flag where i means case insensitivity and g means global 
 
         const slelectedItems = select.split(',').join(' ');
@@ -171,6 +178,7 @@ const listProductController = async (req, res) => {
         // LIMIT Parameter
         query.limit(limitNum);//giving waiter some instructions 
         const products = await query //telling waiter that i have given my order now execute it 
+        query.sort(sort)
 
         res.status(200).json({
             isSuccess: true,

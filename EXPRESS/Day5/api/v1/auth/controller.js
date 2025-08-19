@@ -15,7 +15,6 @@ const usersignupController = async (req, res) => {
             email,
             password,
         });
-
         res.status(201).json({
             isSuccess: true,
             message: "User Created",
@@ -26,22 +25,24 @@ const usersignupController = async (req, res) => {
                 }
             }
         });
-
     } catch (err) {
         console.log("<-----Error In usersignupController------>", err);
-
-        if (err.name === "ValidationError" || err.code === 11000) {
+        if (err.code === 11000) {
             return res.status(400).json({
                 isSuccess: false,
-                message: err.message,
-                data: {}
+                message: "User Account already exits!"
+            });
+        }
+        else if (err.name === "ValidationError") {
+            return res.status(400).json({
+                isSuccess: false,
+                message: err.message
             });
         }
 
         res.status(500).json({
             isSuccess: false,
             message: "Internal Server Error",
-            data: {}
         });
     }
 };

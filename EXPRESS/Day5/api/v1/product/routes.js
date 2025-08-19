@@ -7,13 +7,13 @@ const { createProductValidator, updateProductValidator, } = require("./dto");
 
 const productRouter = express.Router();
 
-productRouter.post("/", createProductValidator,createProductController);
+productRouter.post("/", createProductValidator, createProductController);
 
-productRouter.get("/",listProductController);
+productRouter.get("/", listProductController);
 
 productRouter.get("/all", getAllProductController);
 
-productRouter.patch('/:id', updateProductValidator, editProductController);
+productRouter.patch('/:id',updateProductValidator , editProductController);
 
 productRouter.delete('/:id', deleteProductController);
 
