@@ -46,10 +46,12 @@ app.patch("/api/v1/products/:productId", async (req, res) => {
     const data = req.body;
     // get old array
     const products = await myReadfile(FILE_PATH);
+
     // check if the given id is valid or not 
     const indx = products.findIndex((elem) => {
         return elem.id == productId;
     });
+
     // productId validation
     if (indx == -1) {
         res.status(400);
@@ -59,6 +61,7 @@ app.patch("/api/v1/products/:productId", async (req, res) => {
         })
         return;
     }
+    
     // array search method find index
     // change the old object to replace its properties
     const oldObj = products[indx];

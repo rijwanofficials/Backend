@@ -15,10 +15,10 @@ const transporter = nodemailer.createTransport({
 (async () => {
     try {
         await transporter.verify();
-        console.log("--------✅Email Server is ready to take our message---------");
+        console.log("-----✅ Email Server is ready to take our message----");
     }
     catch (err) {
-        console.log("--------❌Error Connecting Email server---------");
+        console.log("--------❌ Error Connecting Email server---------");
         console.log(err.message);
     }
 })(); //IIFE=Imidate invoke func expression
@@ -42,7 +42,6 @@ const sendEmail = (async (toEmail, subject, htmlText) => {
         throw new Error("Email not sent");
     }
 });
-
 
 const sendOtpEmail = async (toEmail, otp) => {
     console.log("----------Inside the sendOtpEmail-------------");

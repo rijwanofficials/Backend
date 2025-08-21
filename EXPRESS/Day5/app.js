@@ -19,5 +19,5 @@ app.use(express.json()); // read the body in json formate
 app.use("/api/v1", apiRouter);
 
 app.listen(PORT, () => {
-    console.log("--------Server started------");
+    console.log("----- ✅ Server started------");
 });

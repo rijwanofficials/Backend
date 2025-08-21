@@ -56,18 +56,25 @@ const updateProductValidator = (req, res, next) => {
     console.log("------Inside the UPDATE product validator--------");
     try {
         const { title, price, discription, quantity } = req.body;
+        // title validation
+        if (!title || title.length <= 2) {
+            return res.status(400).json({
+                isSuccess: false,
+                message: "title length must be > 2",
+                data: {}
+            });
+        }
 
-        // Quantity validation
+        // quantity validation
         if (quantity && quantity < 0) {
             res.status(400).json({
                 isSuccess: false,
-                message: "Quantity should be > 0 ",
+                message: "quantity should be > 0 ",
                 data: {}
             });
             return;
         }
 
-        // Price validation (only if provided)
         if (price || price < 1) {
             res.status(400).json({
                 isSuccess: false,
@@ -77,16 +84,6 @@ const updateProductValidator = (req, res, next) => {
             return;
         }
 
-        // Title validation (only if provided)
-        if (!title || title.length <= 2) {
-            return res.status(400).json({
-                isSuccess: false,
-                message: "Title length must be > 2",
-                data: {}
-            });
-        }
-
-        // Description validation (only if provided)
         if (discription && discription.length < 5) {
             return res.status(400).json({
                 isSuccess: false,

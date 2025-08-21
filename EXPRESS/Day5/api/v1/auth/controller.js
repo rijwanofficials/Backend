@@ -1,4 +1,6 @@
+const { otpModel } = require("../../../models/otpSchema");
 const { UserModel } = require("../../../models/userSchema");
+const bcrypt = require("bcrypt");
 
 const usersignupController = async (req, res) => {
     try {
@@ -47,4 +49,56 @@ const usersignupController = async (req, res) => {
     }
 };
 
-module.exports = { usersignupController };
+const userloginController = async (req, res) => {
+    try {
+        console.log("<-----Inside userloginController------>");
+        const { email, password } = req.body;
+        console.log(password);
+        // will check if the any user exists with this given email
+        // const otpDocs = await otpModel.findOne().where(email).equals(email).sort("-createdAt");
+        const userDoc = await UserModel.findOne({
+            email: email,
+        }).lean();
+        // validation if user exist or not
+        if (userDoc == null) {
+            res.status(400).json({
+                isSuccess: false,
+                message: "User Account does not exist! Please Singup first",
+            });
+            return;
+        }
+        // i will check if the given password is matching with the password in DB
+        const { password: hashedPassword } = userDoc;
+        const isCorrect = await bcrypt.compare(password.toString(), hashedPassword);
+
+        if (!isCorrect) {
+            res.status(400).json({
+                isSuccess: false,
+                message: "Incorrect password! Please try again...",
+            });
+            // have some logic for max attempt or max try as a user can do 
+            // when ever there is error attempt a count of try 
+            // after the threshold limit is reached! block the activity for some time 
+            return;
+        }
+        res.status(201).json({
+            isSuccess: true,
+            message: "User Logged In",
+            data: {
+                user: {
+                    email: userDoc.email,
+                    id: userDoc._id
+                }
+            }
+        });
+    } catch (err) {
+        console.log("<-----Error In userloginController------>", err);
+        res.status(500).json({
+            isSuccess: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+module.exports = { usersignupController, userloginController };
+
