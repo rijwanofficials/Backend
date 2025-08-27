@@ -1,7 +1,7 @@
 const { otpModel } = require("../../../models/otpSchema");
 const { UserModel } = require("../../../models/userSchema");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken")
 const usersignupController = async (req, res) => {
     try {
         console.log("<-----Inside usersignupController------>");
@@ -81,15 +81,31 @@ const userloginController = async (req, res) => {
             // after the threshold limit is reached! block the activity for some time 
             return;
         }
+        const token = jwt.sign(
+            {
+                email: userDoc.email,
+                _id: userDoc._id,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: 60 * 60 * 24,
+            }
+        )
+        console.log("🚀 ~ userloginController ~", token)
+        res.cookie('authorization', token, {
+            httpOnly: true,
+            sameSite: "None", //production:STRICT            //backend and frontend should on the same domain
+            secure: true   // do you want it only on HTTPs Connection?
+        })
         res.status(201).json({
             isSuccess: true,
             message: "User Logged In",
-            data: {
-                user: {
-                    email: userDoc.email,
-                    id: userDoc._id
-                }
-            }
+            // data: {
+            //     user: {
+            //         email: userDoc.email,
+            //         id: userDoc._id
+            //     }
+            // }
         });
     } catch (err) {
         console.log("<-----Error In userloginController------>", err);

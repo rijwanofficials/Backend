@@ -9,8 +9,10 @@ const PORT = process.env.PORT || 3900;
 
 const app = express();
 app.use(cors({
-    origin: process.env.FRONTEND_URL
-}));
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+})
+);
 
 app.use(morgan("dev")); // for printing in console
 

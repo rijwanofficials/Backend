@@ -119,77 +119,93 @@ const deleteProductController = async (req, res) => {
     }
 };
 
-
 const listProductController = async (req, res) => {
     try {
         console.log("<-----Inside listProductController------>");
+
+        // -------- Extract query parameters --------
         const {
             limit,
             page,
-            select = "title price images quantity",
-            q = "",
-            maxPrice, minPrice,
-            sort = "title -price -createdAt"
+            select = "title price images quantity", // default selected fields
+            q = "",                                 // search query
+            maxPrice,
+            minPrice,
+            sort = "title -price -createdAt"        // default sorting
         } = req.query;
-        const searchRegex = new RegExp(q, "ig"); //ig is flag where i means case insensitivity and g means global 
 
-        const slelectedItems = select.split(',').join(' ');
+        // -------- Regex for search --------
+        // 'i' → case insensitive (Phone = phone)
+        const searchRegex = new RegExp(q, "i");
+
+        // -------- Convert select param --------
+        // "title,price" → "title price"
+        const slelectedItems = select.split(",").join(" ");
+
+        // -------- Limit validation --------
         let limitNum = Number(limit);
         if (limitNum <= 0 || Number.isNaN(limitNum)) {
-            limitNum = 5;
+            limitNum = 5; // default limit
         }
         if (limitNum >= 30) {
-            limitNum = 30;
+            limitNum = 30; // max cap
         }
-        // const limit = 4;
+
+        // -------- Page validation --------
         let pageNum = parseInt(page) || 1;
         if (pageNum <= 0 || Number.isNaN(pageNum)) {
             pageNum = 1;
         }
         const skipNum = (pageNum - 1) * limitNum;
-        const query = ProductModel.find(); // waiter will come and take the order
-        // limit the number or item
 
+        // -------- Start building query --------
+        const query = ProductModel.find();
 
-        // --------QUERY PARAMETER OPTIONS------
-        // SELECT Parameter
+        // 1. SELECT fields
         query.select(slelectedItems);
 
-        // SEARCH QUERY Like search?=phone
-        query.or([{ title: searchRegex }, { description: searchRegex }]);
-
-        // 1------PRICE QUERY
-        const maxpriceNum = Number(maxPrice)
-        if (maxPrice && !Number.isNaN(maxpriceNum)) {
-            query.where("price").lte(maxPrice)
+        // 2. SEARCH (only if q is provided)
+        if (q) {
+            query.or([{ title: searchRegex }, { description: searchRegex }]);
         }
 
-        // 2------PRICE QUERY
-        const minpriceNum = Number(minPrice)
+        // 3. PRICE FILTERS
+        const maxpriceNum = Number(maxPrice);
+        if (maxPrice && !Number.isNaN(maxpriceNum)) {
+            query.where("price").lte(maxPrice);
+        }
+
+        const minpriceNum = Number(minPrice);
         if (minPrice && !Number.isNaN(minpriceNum)) {
             query.where("price").gte(minPrice);
         }
 
-        const queryCopy = query.clone(); //the clone query will have all the instruction that have been given till now 
+        // 4. COUNT total before skip & limit
+        const queryCopy = query.clone();
         const totalDocumentsCount = await queryCopy.countDocuments();
 
-        // SKIP Parameter
-        query.skip(skipNum);
-        // LIMIT Parameter
-        query.limit(limitNum);//giving waiter some instructions 
-        const products = await query //telling waiter that i have given my order now execute it 
-        query.sort(sort)
+        // 5. PAGINATION
+        query.skip(skipNum);     // skip docs
+        query.limit(limitNum);   // limit docs
 
+        // 6. SORTING (must be before execution)
+        query.sort(sort);
+
+        // -------- Execute final query --------
+        const products = await query;
+
+        // -------- Response --------
         res.status(200).json({
             isSuccess: true,
             message: "Products list...",
             data: {
                 products: products,
-                total: totalDocumentsCount,
-                skip: skipNum,
-                limit: Math.min(limitNum, products.length)
+                total: totalDocumentsCount, // total count without pagination
+                skip: skipNum,              // how many skipped
+                limit: Math.min(limitNum, products.length) // items returned
             }
         });
+
     } catch (err) {
         console.log("----Error inside listProductController--->>", err.message);
         res.status(500).json({
@@ -197,7 +213,8 @@ const listProductController = async (req, res) => {
             message: "Failed to fetch products",
             error: err.message
         });
-    };
+    }
 };
+
 
 module.exports = { createProductController, getAllProductController, editProductController, deleteProductController, listProductController }
