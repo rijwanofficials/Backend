@@ -53,7 +53,6 @@ const userloginController = async (req, res) => {
     try {
         console.log("<-----Inside userloginController------>");
         const { email, password } = req.body;
-        console.log(password);
         // will check if the any user exists with this given email
         // const otpDocs = await otpModel.findOne().where(email).equals(email).sort("-createdAt");
         const userDoc = await UserModel.findOne({
@@ -88,14 +87,14 @@ const userloginController = async (req, res) => {
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: 60 * 60 * 24,
+                expiresIn: 60 * 60 * 24, // should be in seconds
             }
         )
-        console.log("🚀 ~ userloginController ~", token)
         res.cookie('authorization', token, {
             httpOnly: true,
             sameSite: "None", //production:STRICT            //backend and frontend should on the same domain
-            secure: true   // do you want it only on HTTPs Connection?
+            secure: true,   // do you want it only on HTTPs Connection?
+            maxAge: 60 * 60 * 24 * 1000    //should be in miliseconds
         })
         res.status(201).json({
             isSuccess: true,
