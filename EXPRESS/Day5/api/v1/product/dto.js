@@ -1,3 +1,5 @@
+const { validateObjectId } = require("../../../utils/validateObjectId");
+
 const createProductValidator = (req, res, next) => {
     try {
         console.log("----Inside createProductValidator----");
@@ -102,5 +104,28 @@ const updateProductValidator = (req, res, next) => {
     }
 };
 
+const viewProductValidator = (req, res, next) => {
+    console.log("------Inside the viewProductValidator--------");
+    try {
+        const { id } = req.params;
+        if (!id) {
+            res.status(400).json({
+                isSuccess: false,
+                message: "Product Id not found",
+            });
+            return;
+        }
+        if (!validateObjectId(id, res)) return;
+        next();
 
-module.exports = { createProductValidator, updateProductValidator };
+    } catch (err) {
+        res.status(500).json({
+            isSuccess: false,
+            message: "Validation error",
+            err: err.message
+        });
+    }
+};
+
+
+module.exports = { createProductValidator, updateProductValidator, viewProductValidator };

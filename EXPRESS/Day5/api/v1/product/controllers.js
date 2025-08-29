@@ -105,6 +105,7 @@ const deleteProductController = async (req, res) => {
                 message: "Product not found"
             });
         }
+
         res.status(200).json({
             isSuccess: true,
             message: "Product deleted successfully",
@@ -119,10 +120,10 @@ const deleteProductController = async (req, res) => {
     }
 };
 
+// GET products with parameter
 const listProductController = async (req, res) => {
     try {
         console.log("<-----Inside listProductController------>");
-
         // -------- Extract query parameters --------
         const {
             limit,
@@ -216,5 +217,35 @@ const listProductController = async (req, res) => {
     }
 };
 
+// VIEW Product
+const viewProductController = async (req, res) => {
+    console.log("<-----Inside viewProductController------>");
+    try {
+        const { id } = req.params
+        const product = await ProductModel.findById(id);
+        
+        if (product == null) {
+            return res.status(404).json({
+                isSuccess: false,
+                message: "Product not found with particular Id"
+            });
+        }
+        res.status(200).json({
+            isSuccess: true,
+            message: "Product found!",
+            data: {
+                product: product
+            },
+        });
+    } catch (err) {
+        console.log("----Error inside viewProductController--->>", err.message);
+        res.status(500).json({
+            isSuccess: false,
+            message: "Failed to fetch product ",
+            error: err.message
+        });
+    };
+};
 
-module.exports = { createProductController, getAllProductController, editProductController, deleteProductController, listProductController }
+
+module.exports = { createProductController, getAllProductController, editProductController, deleteProductController, listProductController, viewProductController }
